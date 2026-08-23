@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role
+  name      String
+  createdAt DateTime @default(now())
+  
+  doctorProfile  DoctorProfile?
+  patientProfile PatientProfile?
+}
+
+model DoctorProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  specialization String
+  workingHours   Json     // e.g. { "monday": ["09:00-17:00"] }
+  slotDuration   Int      // in minutes, e.g. 30
+  leaveDays      DateTime[]
+  appointments   Appointment[]
+}
+
+model PatientProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model Appointment {
+  id               String   @id @default(uuid())
+  patientId        String
+  doctorId         String
+  date             DateTime // The exact start time of the slot
+  status           AppointmentStatus @default(SCHEDULED)
+  
+  patient          PatientProfile @relation(fields: [patientId], references: [id])
+  doctor           DoctorProfile  @relation(fields: [doctorId], references: [id])
+  
+  symptoms         String?
+  preVisitSummary  Json?    // { urgency, chiefComplaint, questions }
+  
+  doctorNotes      String?
+  prescription     String?
+  postVisitSummary Json?    // { patientFriendlySummary, medicationSchedule, followUp }
+  
+  googleEventId    String?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@unique([doctorId, date]) // Prevents double-booking at DB level!
+}
