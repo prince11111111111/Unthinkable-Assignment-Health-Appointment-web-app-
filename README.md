@@ -2,6 +2,10 @@
 
 A full-stack, AI-powered medical appointment booking system built with React, Node.js, Express, Prisma, and PostgreSQL. It features three distinct user roles (Patient, Doctor, Admin) and integrates Google Calendar, Email Notifications, and Google Gemini AI for smart clinical summaries.
 
+## Live Demo
+* **Frontend (Vercel):** [https://unthinkable-assignment-health-appoi.vercel.app](https://unthinkable-assignment-health-appoi.vercel.app)
+* **Backend API (Render):** [https://unthinkable-assignment-health.onrender.com](https://unthinkable-assignment-health.onrender.com)
+
 ## Features
 
 ### 1. Multi-Role Dashboards
