@@ -20,19 +20,24 @@ export const createCalendarEvent = async (appointmentDetails) => {
     return 'mock-event-id';
   }
   try {
+    const startTime = new Date(appointmentDetails.start);
+    const endTime = new Date(startTime.getTime() + appointmentDetails.durationMinutes * 60000);
+
     const event = {
       summary: appointmentDetails.summary,
       description: appointmentDetails.description,
-      start: { dateTime: appointmentDetails.startTime, timeZone: 'UTC' },
-      end: { dateTime: appointmentDetails.endTime, timeZone: 'UTC' },
+      start: { dateTime: startTime.toISOString(), timeZone: 'UTC' },
+      end: { dateTime: endTime.toISOString(), timeZone: 'UTC' },
+      attendees: [{ email: appointmentDetails.attendeeEmail }]
     };
     const response = await calendar.events.insert({
       calendarId: 'primary',
       resource: event,
+      sendUpdates: 'all'
     });
     return response.data.id;
   } catch (error) {
-    console.error('Calendar Event Creation Failed:', error);
+    console.error('Calendar Event Creation Failed:', error.message || error);
     return null;
   }
 };
